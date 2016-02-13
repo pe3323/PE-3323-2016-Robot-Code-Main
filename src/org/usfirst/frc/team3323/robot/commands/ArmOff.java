@@ -15,7 +15,7 @@ public class ArmOff extends CommandBase {
     }
 
     protected void execute() {
-        arm.off();
+        arm.stop();
     }
 
     protected boolean isFinished() {

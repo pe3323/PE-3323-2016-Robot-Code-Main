@@ -6,7 +6,7 @@ public class ArmDown extends CommandBase {
     
 	private Arm arm;
 
-	public ArmDown( Arm arm) {
+	public ArmDown( Arm arm ) {
     	this.arm = arm;
         requires(arm);
     }
@@ -15,7 +15,7 @@ public class ArmDown extends CommandBase {
     }
 
     protected void execute() {
-        arm.ArmDown();
+        arm.down();
     }
 
     protected boolean isFinished() {

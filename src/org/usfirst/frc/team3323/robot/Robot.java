@@ -1,61 +1,110 @@
 package org.usfirst.frc.team3323.robot;
 
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3323.robot.subsystems.Arm;
 import org.usfirst.frc.team3323.robot.subsystems.DriveTrain;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import org.usfirst.frc.team3323.robot.subsystems.RobotPart;
 
-public class Robot extends IterativeRobot {
+import java.util.ArrayList;
+import java.util.List;
 
-	private DriveTrain driveMarkus;
-	private OI OmarkusI;
-    private Arm arm;
-    private Command autoMarkus;
+public class Robot extends IterativeRobot
+{
+  private DriveTrain driveTrain;
+  private OI operatorControls;
+  private Arm humerus;
+  private Arm radius;
+  private List<RobotPart> robotParts = new ArrayList();
 
-   public void robotInit() {
-	   driveMarkus = new DriveTrain( this );
-	   arm = new Arm( this );
-	   OmarkusI = new OI( this );	   	 
-	   
-//       autoMarkus = new AutonomousMode( this )        
-   }
+  /**
+   * construct the robot
+   */
+  public void robotInit()
+  {
+    //Construct drive train
+    driveTrain = new DriveTrain(this);
 
-   public void autonomousInit() {
-       autoMarkus.start();
-   }
+    //Construct operator controls
+    operatorControls = new OI(this);
 
-   public void autonomousPeriodic() {
-       Scheduler.getInstance().run();
-   }
+    //Construct the humerus part of the arm
+    SpeedController humerusMotor = new Jaguar(RobotMap.humerusMotor);
+    Encoder humerusEncoder = new Encoder(RoboRIOPort.ONE.getValue(), RoboRIOPort.TWO.getValue(), true, CounterBase.EncodingType.k4X);
+    humerus = new Arm("humerus", humerusMotor, humerusEncoder );
 
-   public void teleopInit() {
-         if(autoMarkus != null) {
-           autoMarkus.cancel();
-//           autonomousCommand = null;
-       }
-   }
-   
-   public void teleopPeriodic() {
-       Scheduler.getInstance().run();
-   }
-    
-   public void testPeriodic() {
-       LiveWindow.run();
-   }
-   
-public DriveTrain getDrive() {
-	return driveMarkus;
-}
+    //Construct the Radius part of the arm
+    SpeedController radiusMotor = new Jaguar(RobotMap.radiusMotor);
+    Encoder radiusEncoder = null;
+    radius = new Arm("Radius", radiusMotor, radiusEncoder);
+  }
 
-public Arm getArm() {
-	return arm;
-}
+  public OI getOperatorControls()
+  {
+    return operatorControls;
+  }
 
-public OI getOperatorControls() {
-	return OmarkusI;
-}
-   
-   
+  public DriveTrain getDriveTrain()
+  {
+    return driveTrain;
+  }
+
+  public Arm getHumerus()
+  {
+    return humerus;
+  }
+
+  public Arm getRadius()
+  {
+    return radius;
+  }
+
+  /**
+   *
+   */
+  public void autonomousInit()
+  {
+    displayRobotDiagnostics();
+  }
+
+  public void autonomousPeriodic()
+  {
+    Scheduler.getInstance().run();
+    displayRobotDiagnostics();
+  }
+
+  /**
+   *
+   */
+  public void teleopInit()
+  {
+    displayRobotDiagnostics();
+  }
+
+  public void teleopPeriodic()
+  {
+    Scheduler.getInstance().run();
+    displayRobotDiagnostics();
+  }
+
+  private void displayRobotDiagnostics()
+  {
+    for( RobotPart robotPart : robotParts )
+    {
+      for( Diagnostic diagnostic : robotPart.getDiagnostics() )
+      {
+        SmartDashboard.putString( robotPart.getName() + " " + diagnostic.getName(), diagnostic.getValue().toString());
+      }
+    }
+  }
+
+  /**
+   *
+   */
+  public void testPeriodic()
+  {
+    LiveWindow.run();
+  }
 }
